@@ -1,5 +1,6 @@
 package expo.modules.notifications.notifications.service;
 
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -10,6 +11,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationManagerCompat;
 import expo.modules.notifications.notifications.model.Notification;
 import expo.modules.notifications.notifications.model.NotificationResponse;
 
@@ -41,6 +43,11 @@ public class NotificationResponseReceiver extends BroadcastReceiver {
     NotificationResponse response = intent.getParcelableExtra(NOTIFICATION_RESPONSE_KEY);
     openAppToForeground(context, response);
     BaseNotificationsService.enqueueResponseReceived(context, response);
+
+    NotificationManagerCompat manager = NotificationManagerCompat.from(context);
+    manager.cancel(response.getNotification().getNotificationRequest().getIdentifier(), 0);
+    Intent it = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+    context.sendBroadcast(it);
   }
 
   protected void openAppToForeground(Context context, NotificationResponse notificationResponse) {

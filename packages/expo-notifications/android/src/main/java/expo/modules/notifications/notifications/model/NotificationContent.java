@@ -10,6 +10,8 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
+import java.util.List;
+import java.util.Set;
 
 import androidx.annotation.Nullable;
 import expo.modules.notifications.notifications.enums.NotificationPriority;
@@ -27,6 +29,7 @@ public class NotificationContent implements Parcelable, Serializable {
   private Uri mSound;
   private boolean mShouldUseDefaultVibrationPattern;
   private long[] mVibrationPattern;
+  private JSONObject mActions;
   private JSONObject mBody;
   private NotificationPriority mPriority;
   private Number mColor;
@@ -91,6 +94,11 @@ public class NotificationContent implements Parcelable, Serializable {
   }
 
   @Nullable
+  public JSONObject getActions() {
+    return mActions;
+  }
+
+  @Nullable
   public NotificationPriority getPriority() {
     return mPriority;
   }
@@ -120,6 +128,7 @@ public class NotificationContent implements Parcelable, Serializable {
     mVibrationPattern = in.createLongArray();
     try {
       mBody = new JSONObject(in.readString());
+      mActions = new JSONObject(in.readString());
     } catch (JSONException | NullPointerException e) {
       // do nothing
     }
@@ -142,6 +151,7 @@ public class NotificationContent implements Parcelable, Serializable {
     dest.writeByte((byte) (mShouldUseDefaultVibrationPattern ? 1 : 0));
     dest.writeLongArray(mVibrationPattern);
     dest.writeString(mBody != null ? mBody.toString() : null);
+    dest.writeString(mActions != null ? mActions.toString() : null);
     dest.writeSerializable(mPriority != null ? mPriority.getNativeValue() : null);
     dest.writeSerializable(mColor);
     dest.writeByte((byte) (mAutoDismiss ? 1 : 0));
@@ -167,6 +177,7 @@ public class NotificationContent implements Parcelable, Serializable {
       }
     }
     out.writeObject(mBody != null ? mBody.toString() : null);
+    out.writeObject(mActions != null ? mActions.toString() : null);
     out.writeObject(mPriority != null ? mPriority.getNativeValue() : null);
     out.writeObject(mColor);
     out.writeByte(mAutoDismiss ? 1 : 0);
@@ -195,11 +206,21 @@ public class NotificationContent implements Parcelable, Serializable {
       }
     }
     String bodyString = (String) in.readObject();
+    String actionsString = (String) in.readObject();
     if (bodyString == null) {
       mBody = null;
     } else {
       try {
         mBody = new JSONObject(bodyString);
+      } catch (JSONException | NullPointerException e) {
+        // do nothing
+      }
+    }
+    if (actionsString == null) {
+      mActions = null;
+    } else {
+      try {
+        mActions = new JSONObject(actionsString);
       } catch (JSONException | NullPointerException e) {
         // do nothing
       }
@@ -224,6 +245,7 @@ public class NotificationContent implements Parcelable, Serializable {
     private Uri mSound;
     private boolean mShouldUseDefaultVibrationPattern;
     private long[] mVibrationPattern;
+    private JSONObject mActions;
     private JSONObject mBody;
     private NotificationPriority mPriority;
     private Number mColor;
@@ -251,6 +273,11 @@ public class NotificationContent implements Parcelable, Serializable {
 
     public Builder setBody(JSONObject body) {
       mBody = body;
+      return this;
+    }
+
+    public Builder setActions(JSONObject actions) {
+      mActions = actions;
       return this;
     }
 
@@ -303,6 +330,7 @@ public class NotificationContent implements Parcelable, Serializable {
       content.mTitle = mTitle;
       content.mSubtitle = mSubtitle;
       content.mText = mText;
+      content.mActions = mActions;
       content.mBadgeCount = mBadgeCount;
       content.mShouldUseDefaultVibrationPattern = mShouldUseDefaultVibrationPattern;
       content.mVibrationPattern = mVibrationPattern;

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.ResultReceiver;
+import android.util.Log;
 
 import org.unimodules.core.ExportedModule;
 import org.unimodules.core.Promise;
@@ -68,6 +69,7 @@ public class NotificationScheduler extends ExportedModule {
     try {
       NotificationContent content = new ArgumentsNotificationContentBuilder(getContext()).setPayload(notificationContentMap).build();
       NotificationRequest request = createNotificationRequest(identifier, content, triggerFromParams(triggerParams));
+      // Log.e("expo-notifications", "content.actions: " + (request.getContent().getActions() != null ? request.getContent().getActions().toString() : "null"));
       ExpoNotificationSchedulerService.enqueueSchedule(getContext(), request, new ResultReceiver(HANDLER) {
         @Override
         protected void onReceiveResult(int resultCode, Bundle resultData) {

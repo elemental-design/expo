@@ -8,8 +8,11 @@ import android.util.Log;
 import org.json.JSONObject;
 import org.unimodules.core.arguments.ReadableArguments;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import androidx.annotation.Nullable;
 import expo.modules.notifications.notifications.channels.InvalidVibrationPatternException;
@@ -27,6 +30,7 @@ public class ArgumentsNotificationContentBuilder extends NotificationContent.Bui
   private static final String BADGE_KEY = "badge";
   private static final String COLOR_KEY = "color";
   private static final String AUTO_DISMISS_KEY = "autoDismiss";
+  private static final String ACTIONS_KEY = "actions";
 
   private SoundResolver mSoundResolver;
 
@@ -39,6 +43,7 @@ public class ArgumentsNotificationContentBuilder extends NotificationContent.Bui
         .setSubtitle(payload.getString(SUBTITLE_KEY))
         .setText(payload.getString(TEXT_KEY))
         .setBody(getBody(payload))
+        .setActions(getActions(payload))
         .setPriority(getPriority(payload))
         .setBadgeCount(getBadgeCount(payload))
         .setColor(getColor(payload))
@@ -59,6 +64,22 @@ public class ArgumentsNotificationContentBuilder extends NotificationContent.Bui
 
   protected Number getBadgeCount(ReadableArguments payload) {
     return payload.containsKey(BADGE_KEY) ? payload.getInt(BADGE_KEY) : null;
+  }
+
+  protected JSONObject getActions(ReadableArguments payload) {
+    try {
+      JSONObject actions = new JSONObject();
+      List body = payload.getList(ACTIONS_KEY);
+
+      if (body != null) {
+        actions.put("items", body);
+        // Log.e("expo-notifications", "Body: " + actions.toString());
+      }
+      return actions;
+    } catch (Exception e) {
+      Log.e("expo-notifications", "Couldn't get actions.");
+      return null;
+    }
   }
 
   protected Number getColor(ReadableArguments payload) {

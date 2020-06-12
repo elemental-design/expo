@@ -88,7 +88,7 @@ public abstract class ChannelAwareNotificationBuilder extends BaseNotificationBu
     return getContext().getString(R.string.expo_notifications_fallback_channel_name);
   }
 
-  private NotificationManager getNotificationManager() {
+  public NotificationManager getNotificationManager() {
     return (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
   }
 }

@@ -1,6 +1,7 @@
 package expo.modules.notifications.notifications.presentation.builders;
 
 import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -10,6 +11,14 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.provider.Settings;
 import android.util.Log;
+import android.R;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.List;
+import java.util.Set;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
@@ -48,6 +57,33 @@ public class ExpoNotificationBuilder extends ChannelAwareNotificationBuilder {
     builder.setContentTitle(content.getTitle());
     builder.setContentText(content.getText());
     builder.setSubText(content.getSubtitle());
+    JSONObject actions = content.getActions();
+
+    if (actions != null) {
+      // Log.e("expo-notifications", "Actions: " + actions.toString());
+      try {
+        // Log.e("expo-notifications", "actions: " + actions.toString());
+//        JSONArray actionItems = actions.getJSONArray("items");
+        JSONArray actionItems = new JSONArray(actions.getString("items"));
+        // Log.e("expo-notifications", "actionItems: " + actionItems.toString());
+
+        int length = actionItems.length();
+        for (int i = 0; i < length; i += 1) {
+          JSONObject jsonAction = actionItems.getJSONObject(i);
+          // Log.e("expo-notifications", "jsonAction: " + jsonAction.toString());
+
+          String actionIdentifier = jsonAction.getString("actionId");
+          String actionTitle = jsonAction.getString("buttonTitle");
+          PendingIntent actionIntent = getActionIntent(getContext(), "expo.modules.notifications.actions." + actionIdentifier, getNotification());
+          builder.addAction(R.drawable.ic_notification_overlay, actionTitle, actionIntent);
+          builder.setAutoCancel(true);
+        }
+      } catch (JSONException e) {
+        e.printStackTrace();
+        Log.e("expo-notifications", "Actions ERROR: " + e.toString());
+      }
+    }
+
     // Sets the text/contentText as the bigText to allow the notification to be expanded and the
     // entire text to be viewed.
     builder.setStyle(new NotificationCompat.BigTextStyle().bigText(content.getText()));

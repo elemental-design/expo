@@ -56,6 +56,9 @@ public class NotificationSerializer {
       serializedContent.putString("color", String.format("#%08X", content.getColor().intValue()));
     }
     serializedContent.putBundle("data", toBundle(content.getBody()));
+    if (content.getActions() != null) {
+      serializedContent.putBundle("actions", toBundle(content.getActions()));
+    }
     if (content.getBadgeCount() != null) {
       serializedContent.putInt("badge", content.getBadgeCount().intValue());
     } else {
